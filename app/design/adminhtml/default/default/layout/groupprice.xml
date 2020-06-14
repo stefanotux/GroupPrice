@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+  <groupprice_adminhtml_grouppricebackend_index>
+	<reference name="content">
+	  <block type="groupprice/adminhtml_grouppricebackend" name="grouppricebackend" template="groupprice/grouppricebackend.phtml"/>
+	</reference>
+  </groupprice_adminhtml_grouppricebackend_index>
+</layout>

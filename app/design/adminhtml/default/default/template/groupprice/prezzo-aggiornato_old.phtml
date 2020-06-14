@@ -1,0 +1,49 @@
+<?php
+    define('INCREMENTALE_IVA','1.22');
+ 
+    $connection = Mage::getSingleton('core/resource')->getConnection('core_read');
+    $sql_groupPrice = "SELECT * FROM mg_catalog_product_entity_group_price";
+    $ArrayGroupPrice=$connection->fetchAll($sql_groupPrice);
+    //var_dump($ArrayGroupPrice);
+    foreach ($ArrayGroupPrice as $GroupPriceElement){
+        if ( ($GroupPriceElement['entity_id']==$_POST['idProdotto']) && ($GroupPriceElement['customer_group_id']==$_POST['CustomerGroupId']) ){
+			?><h2>Prezzo Aggiornato con successo!</h2><?php
+            $GroupPriceValue=round(( INCREMENTALE_IVA*$GroupPriceElement['value'] ), 2);
+            $sql_UpdateGroupPrice="UPDATE `mg_catalog_product_entity_group_price` SET `value`=".$GroupPriceValue." WHERE `customer_group_id`=".$_POST['CustomerGroupId']. " AND `entity_id`=".$_POST['idProdotto'];
+            $writeConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
+            $writeConnection->query($sql_UpdateGroupPrice);
+            echo "<br/>";
+        }
+    }
+$counter=0;
+
+     if ($_POST['allProducts']=="all"){
+        foreach ($ArrayGroupPrice as $GroupPriceElement){
+
+            $GroupPriceValue=round(( INCREMENTALE_IVA*$GroupPriceElement['value'] ), 2);
+            //echo  $counter;
+            $sql_UpdateGroupPrice="UPDATE `mg_catalog_product_entity_group_price` SET `value`=".$GroupPriceValue." WHERE `customer_group_id`=".$_POST['CustomerGroupId']." AND `entity_id`=".$GroupPriceElement['entity_id'];
+            $writeConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
+            $writeConnection->query($sql_UpdateGroupPrice);
+            $counter++;
+        }
+        ?><h2>Prezzi Aggiornati con successo!</h2><?php
+		/**
+		$sql_groupPrice3 = "SELECT * FROM `mg_catalog_product_entity_group_price` WHERE `customer_group_id`=3";
+		$ArrayGroupPrice3=$connection->fetchAll($sql_groupPrice);
+		foreach ($ArrayGroupPrice3 as $GroupPriceElement3){
+			echo $sql_UpdateGroupPrice2="UPDATE `mg_catalog_product_entity_group_price` SET `value`=".$GroupPriceElement3['value']." WHERE `customer_group_id`=2 AND `entity_id`=".$GroupPriceElement3['entity_id'];
+			$writeConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
+            $writeConnection->query($sql_UpdateGroupPrice2);
+                        echo "<br/>";
+
+
+		}
+       **/
+     }
+
+
+?>
+
+<hr/>
+Torna alla <a href="<?php echo Mage::helper("adminhtml")->getUrl("admin_groupprice/adminhtml_grouppricebackend/index") ?>">Index Update Price.</a> 

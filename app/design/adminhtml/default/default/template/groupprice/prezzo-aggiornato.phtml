@@ -1,0 +1,81 @@
+<?php
+    define('INCREMENTALE_IVA','1.22');
+ 
+    /*$connection = Mage::getSingleton('core/resource')->getConnection('core_read');
+    $sql_groupPrice = "SELECT * FROM mg_catalog_product_entity_group_price";
+    $ArrayGroupPrice=$connection->fetchAll($sql_groupPrice);
+    var_dump($ArrayGroupPrice);*/
+    
+    $productsIT = Mage::getModel('catalog/product')
+                        ->getCollection()
+                        ->addAttributeToSelect('*')
+                        ->addAttributeToFilter('status', array('eq' => 1))
+                        ->addAttributeToFilter('visibility', array('eq' => 4))
+                        ->load();
+    $productsIT->setStoreId(1);
+    $productsIT->addAttributeToSelect('*');
+    
+    $prodIds=$productsIT->getAllIds();
+    $i=0;
+    
+	if (isset($_POST['idProdotto']) ) {    
+		
+		// acchiappa il prodotto selezionato
+		$prodottoIT = Mage::getModel('catalog/product')->load($_POST['idProdotto']);	
+		$groupPrices = $prodottoIT->getData('group_price');
+		$nomeProd=$prodottoIT->getName();
+			
+		?><h2>Prezzo Aggiornato con successo!</h2><?php
+		//echo $sql_UpdateGroupPrice="UPDATE `mg_catalog_product_entity_group_price` SET `value`=".$groupPrices[$i]["price"]." WHERE `customer_group_id`=".$_POST['CustomerGroupId']. " AND `entity_id`=".$_POST['idProdotto'];
+						
+		// the group data is expecting an array of arrays that look like.. 
+		// array ('website_id'=>y, 'cust_group'=>z, 'price'=>n)
+		$groupPricingData = array (
+		  // for all websites, per Rivenditore Estero
+		  array ('website_id'=>0, 'cust_group'=> 3, 'price'=> ( (INCREMENTALE_IVA*$groupPrices[0]["price"]) ) ),
+		  // for all websites, per Rivenditore Italia
+		  array ('website_id'=>0, 'cust_group'=> 5, 'price'=>( $groupPrices[1]["price"] ) ) 
+		);
+		$prodottoIT->setData('group_price',$groupPricingData);
+		$prodottoIT->save();
+						
+		/*$GroupPriceValue=round(( INCREMENTALE_IVA*$GroupPriceElement['value'] ), 2);
+		$sql_UpdateGroupPrice="UPDATE `mg_catalog_product_entity_group_price` SET `value`=".$GroupPriceValue." WHERE `customer_group_id`=".$_POST['CustomerGroupId']. " AND `entity_id`=".$_POST['idProdotto'];
+		$writeConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
+		$writeConnection->query($sql_UpdateGroupPrice);*/
+		echo "<br/>";
+
+			
+			
+		
+	 }
+
+  if (isset($_POST['allProducts'])) {
+
+     if ($_POST['allProducts']=="all"){
+       /** versione obsoleta **************** foreach ($ArrayGroupPrice as $GroupPriceElement){ }
+       *** aggiorno TUTTI I PRODOTTI
+       *** cicla su TUTTI i prodotti  **/
+		foreach($prodIds as $productId) {
+			$prodottoIT = Mage::getModel('catalog/product')->load($productId);	
+			$groupPrices = $prodottoIT->getData('group_price');
+			$nomeProd=$prodottoIT->getName();
+			
+			$groupPricingData = array (
+					  // for all websites, per Rivenditore Estero
+					  array ('website_id'=>0, 'cust_group'=> 3, 'price'=> ( (INCREMENTALE_IVA*$groupPrices[0]["price"]) ) ),
+					  // for all websites, per Rivenditore Italia
+					  array ('website_id'=>0, 'cust_group'=> 5, 'price'=>( $groupPrices[1]["price"] ) ) 
+					);
+			$prodottoIT->setData('group_price',$groupPricingData);
+			$prodottoIT->save();
+			
+		}
+		?><h2>Prezzi Aggiornati con successo!</h2><?php
+
+     }
+   }
+?>
+
+<hr/>
+Torna alla <a href="<?php echo Mage::helper("adminhtml")->getUrl("admin_groupprice/adminhtml_grouppricebackend/index") ?>">Index Update Price.</a> 

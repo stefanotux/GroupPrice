@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<config>
+  <modules>
+    <TuxWeb_GroupPrice>
+      <version>0.1.0</version>
+    </TuxWeb_GroupPrice>
+  </modules>
+  <global>
+    <helpers>
+      <groupprice>
+        <class>TuxWeb_GroupPrice_Helper</class>
+      </groupprice>
+    </helpers>
+	<blocks>
+	  <groupprice>
+		<class>TuxWeb_GroupPrice_Block</class>
+	  </groupprice>
+	</blocks>
+  </global>
+  <admin>
+	<routers>
+	  <groupprice>
+	    <use>admin</use>
+		<args>
+		  <module>TuxWeb_GroupPrice</module>
+		  <frontName>admin_groupprice</frontName>
+		</args>
+	  </groupprice>
+	</routers>
+  </admin>
+  <adminhtml>
+	<menu>
+	  <groupprice module="groupprice">
+		<title>GroupPrice</title>
+		<sort_order>100</sort_order>
+		<children>
+		  <grouppricebackend module="groupprice">
+			<title>Update Group Price</title>
+			<sort_order>0</sort_order>
+			<action>admin_groupprice/adminhtml_grouppricebackend</action>
+		  </grouppricebackend>
+		</children>
+	  </groupprice>
+	</menu>
+	<acl>
+	  <resources>
+		<all>
+		  <title>Allow Everything</title>
+		</all>
+		<admin>
+		  <children>
+			<groupprice translate="title" module="groupprice">
+			  <title>GroupPrice</title>
+			  <sort_order>1000</sort_order>
+			  <children>
+		  <grouppricebackend translate="title">
+			<title>Update22 Group Price</title>
+		  </grouppricebackend>
+			  </children>
+			</groupprice>
+		  </children>
+		</admin>
+	  </resources>
+	</acl>
+	<layout>
+	  <updates>
+		<groupprice>
+		  <file>groupprice.xml</file>
+		</groupprice>
+	  </updates>
+	</layout>
+  </adminhtml>
+</config> 

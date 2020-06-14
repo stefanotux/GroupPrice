@@ -1,0 +1,294 @@
+<style type="text/css">
+table td {
+    border-width: 0 1px 1px 0;
+    border-color: #dadfe0;
+    border-style: solid;
+    font-size: 16px;
+}
+.check-flag {
+	background-color:red;
+	color:#fff;
+}
+tr.headings th {
+    border-width: 1px;
+    border-color: #f9f9f9 #d1cfcf #f9f9f9 #f9f9f9;
+    border-style: solid;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 16px;
+}
+tr.headings {
+    background: url(https://www.logicagiochi.com/skin/adminhtml/default/default/images/sort_row_bg.gif) 0 50% repeat-x;
+}
+.group-price-table {
+  width:1500px;
+  height: 850px;
+  overflow-y: scroll;
+  margin-left: 5em;
+  overflow-x: visible;
+  padding: 0;
+}
+
+.headings {
+  position: absolute;
+  top:350px;
+  width:1500px;
+  /*only relevant for first row*/
+  /*compensate for top border*/
+}
+
+</style>
+<h2>Update Group Price</h2>
+<table cellspacing="25" width="100%">
+        <tbody>
+			<colgroup>
+			<col style="width:50%">
+			<col style="width:50%">
+		    </colgroup>
+			<tr>
+            <td>
+				<div style="position:relative; border:1px dotted red; margin:6px 2px; padding:18px 2px 2px 2px; zoom:1;">
+					<h2>Aggiungi Aliquota su Rivenditore Estero</h2>
+					<form action="<?php echo Mage::helper("adminhtml")->getUrl("admin_groupprice/adminhtml_grouppricebackend/addIvaPrezzoRiv") ?>"  method="post" enctype="multipart/form-data">
+						<p> <label>Inserisci Id Prodotto</label>
+							<input type="text" name="idProdotto" value=""></p>
+						
+						<p><input type="checkbox" name="allProducts" value="all"> Aggiorna tutti i prodotti</p>
+						<p><button title="Aggiungi IVA su Customer Group Price" type="submit" class="scalable add" style=""><span><span><span>Aggiungi IVA su Customer Group Price</span></span></span></button>
+						</p>
+					<input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>" />
+					</form>
+				</div>
+			</td>
+			<td>
+				<div style="position:relative; border:1px dotted red; margin:6px 2px; padding:18px 2px 2px 2px; zoom:1;">
+					<form action="<?php echo Mage::helper("adminhtml")->getUrl("admin_groupprice/adminhtml_grouppricebackend/reverseIvaPrezzoRiv") ?>"  method="post" enctype="multipart/form-data">
+					<h2>Togli Aliquota su Rivenditore Estero</h2>
+					<p> <label>Inserisci Id Prodotto</label>
+							<input type="text" name="idProdotto" value=""></p>
+					
+					<p><input type="checkbox" name="allProducts" value="all"> Aggiorna tutti i prodotti</p>
+
+					<p><button title="Togli IVA da Customer Group Price" type="submit" class="scalable less" style="">
+						<i class="fa fa-minus-circle"></i>
+						<span>Togli IVA da Customer Group Price</span>
+						</button>
+						</p>
+					<input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>" />
+					</form>
+				</div>
+			</td>
+			</tr>
+		</tbody>
+</table>
+
+<?php
+	$col6="";
+	$convalidato=0;
+    $productsIT = Mage::getModel('catalog/product')
+                        ->getCollection()
+                        ->addAttributeToSelect('*')
+                        ->setStoreId(1)
+                        ->addAttributeToFilter('status', array('eq' => 1))
+                        ->addAttributeToFilter('visibility', array('eq' => 4))
+                        ->load();
+    
+    $prodIds=$productsIT->getAllIds();
+    
+	foreach($prodIds as $productId) {
+		
+		$prodottoIT = Mage::getModel('catalog/product')->setStoreId(1)->load($productId);	
+		$groupPrices = $prodottoIT->getData('group_price');
+		if  (count($groupPrices)!=2) {
+			$col1='width="3%"';	
+			$col2='width="7%"';	
+			$col3='width="58.83%"';	
+			$col4='width="15%"';	
+			$col5='width="15%"';	
+			$col6='width="15%"';
+			$convalidato=0;
+			break;	
+		} else {
+			$convalidato=1;
+		}
+	
+	}
+	if ($convalidato==1){
+			$col1='width="3%"';	
+			$col2='width="7%"';	
+			$col3='width="62.24%"';
+			$col4='width="15.1%"';	
+			$col5='width="15.1%"';	
+	}
+    
+/**************
+    foreach($prodIds as $productId) {
+			$product = Mage::getModel('catalog/product')->load($productId);
+			$groupPrices = $product->getData('group_price');
+			
+			$nomeProd=$product->getName();
+			echo "ID: ".$productId." | Nome Prodotto: ".$nomeProd."<br/>";
+			
+
+	}
+
+    
+    $connection = Mage::getSingleton('core/resource')->getConnection('core_read');
+    $sql_groupPrice2 = "SELECT * FROM mg_catalog_product_entity_group_price WHERE customer_group_id=3";   // sql Riv Estero
+    $sql_groupPrice3 = "SELECT * FROM mg_catalog_product_entity_group_price WHERE customer_group_id=5";   // sql Riv Italia
+    $ArrayGroupPrice2=$connection->fetchAll($sql_groupPrice2);
+    $ArrayGroupPrice3=$connection->fetchAll($sql_groupPrice3);
+*************/
+    ?>
+<div class="group-price-table">
+
+    <table cellspacing="0" class="data" id="awpgridProducts_table">
+                <colgroup>
+				<?php if ($col6!=""): ?>
+					<col <?php echo $col1 ?>>
+					<col <?php echo $col2 ?>>
+					<col <?php echo $col3 ?>>
+					<col <?php echo $col4 ?>>
+					<col <?php echo $col5 ?>>
+					<col <?php echo $col6 ?>>
+				<?php else: ?>
+					<col <?php echo $col1 ?>>
+					<col <?php echo $col2 ?>>
+					<col <?php echo $col3 ?>>
+					<col <?php echo $col4 ?>>
+					<col <?php echo $col5 ?>>
+				<?php endif; ?>
+                </colgroup>
+          <thead>
+			<tr class="headings">
+				<th <?php echo $col1 ?>><span class="nobr"><a href="#" name="entity_id" title="asc" class="not-sort"><span class="sort-title">ID</span></a></span></th>
+				<th <?php echo $col2 ?>><span class="nobr"><a href="#" name="entity_id" title="asc" class="not-sort"><span class="sort-title">ID Prodotto</span></a></span></th>
+				<th <?php echo $col3 ?>><span class="nobr"><a href="#" name="name" title="asc" class="not-sort"><span class="sort-title">Nome</span></a></span></th>
+				<th <?php echo $col4 ?>><span class="nobr"><a href="#" name="priceRiv2" title="asc" class="not-sort"><span class="sort-title">Prezzo Rivenditore Estero</span></a></span></th>
+				<th <?php echo $col5 ?>><span class="nobr"><a href="#" name="priceRiv1" title="asc" class="not-sort"><span class="sort-title">Prezzo Rivenditore Italia</span></a></span></th>
+				<?php if ($col6!=""): ?>
+					<th <?php echo $col6 ?>><span class="nobr"></span></th>
+				<?php endif; ?>
+			</tr>
+		  </thead>
+		  <tbody>
+			  	<?php
+			  	$i=0;
+
+				$i=0;
+				$counter=1;
+				foreach($prodIds as $productId) {
+					
+					$prodottoIT = Mage::getModel('catalog/product')->setStoreId(1)->load($productId);	
+					$groupPrices = $prodottoIT->getData('group_price');
+					$nomeProd=$prodottoIT->getName();
+					if ($nomeProd) {
+					?> 
+					<tr title="" class="even">
+						 <td <?php echo $col1 ?> class="a-left  ">
+							<?php echo $counter++; ?> 
+						 </td>
+						 <td <?php echo $col2 ?> class="a-left  ">
+							<?php echo $productId ?> 
+						 </td>
+						 <td <?php echo $col3  ?> class="a-left  ">
+							<a rel="external" href="<?php echo Mage::helper('adminhtml')->getUrl('adminhtml/catalog_product/edit', array('id' => $productId ))?> "title="<?php echo $nomeProd ?>" target="_blank"><?php echo $nomeProd ?> </a>
+						 </td>
+						 <?php
+						 for ($i=0;$i<2;$i++){
+							  if ($i==0){
+							 ?>
+							 <td <?php echo $col4 ?> class="a-center  ">
+								<?php 
+								if ($prodottoIT->getTypeId() == 'bundle') 
+									echo Mage::helper('core')->currency( ( $prodottoIT->getPrice() - ( $prodottoIT->getPrice() * ($groupPrices[0]["price"]/100) ) ), true, false);
+								 else
+									echo Mage::helper('core')->currency($groupPrices[0]["price"], true, false);
+								 ?> 
+							 </td>							 
+							 <?php
+						     } else if  ($i==1){
+							 ?>
+							 <td <?php echo $col5 ?> class="a-center  ">
+								<?php 
+								 if ($prodottoIT->getTypeId() == 'bundle') 
+									echo Mage::helper('core')->currency( ( $prodottoIT->getPrice() - ( $prodottoIT->getPrice() * ($groupPrices[1]["price"]/100) ) ), true, false);
+								 else
+									echo Mage::helper('core')->currency($groupPrices[1]["price"], true, false);
+								 ?> 
+							 </td>
+							 <?php
+							 }
+						  }
+						  if ( (count($groupPrices)!=2) && ($prodottoIT->getTypeId() != 'bundle') && ($prodottoIT->getTypeId() != 'grouped')  ) { ?>
+							 <td <?php echo $col6 ?> class="a-center check-flag ">ATTENZIONE!!! DA CONTROLLARE!!!</td>
+							 <?php
+						  } else { ?>
+							  <td></td>
+						  <?php } ?>
+					</tr>
+				    <?php
+					}
+				}
+			    ?> 
+		  </tbody>
+	</table>
+</div>
+
+    <?php
+ /*   foreach ($ArrayGroupPrice as $GroupPriceElement){
+        
+        echo  "ID Prodotto: ".$GroupPriceElement['entity_id']. " | Nome Prodotto: ".$nomeProd. " | Il prezzo associato al gruppo cliente n. ".$GroupPriceElement['customer_group_id']. " è : ".$GroupPriceElement['value'];  
+        echo "<br/>";
+
+/**
+
+    foreach($prodIds as $productId) {
+        
+        $group_id = 3;
+        //$grp_price = $productsIT->getData('group_price');
+        $customerGroup = 4;
+        
+        //$FinalPrice=Mage::getResourceModel('catalogrule/rule')->getRulePrice( $now, 1, $customerGroup, $productId);
+        
+        //$groupPrices = $productsIT->getData('group_price');
+           
+        $groupPrices = $productsIT->getResource()->getAttribute('group_price');
+      
+        //$attribute->getBackend()->afterLoad($productsIT);
+        $groupPrices = $productsIT->getData('group_price');
+        
+        echo 'product name: '.$productsIT->getName().'<br/>';
+
+    
+    
+    }
+
+**/  /**
+$_productCollection = Mage::getModel('catalog/product')
+                        ->getCollection()
+                        ->addAttributeToSort('created_at', 'DESC')
+                        ->addAttributeToSelect('*')
+                        ->load();
+
+foreach ($_productCollection as $_product){
+   
+   echo $_product->getId().'</br>';
+   echo $_product->getName().'</br>';
+   //echo $_product->getProductUrl().'</br>';
+
+   $groupPrices = $_product->getResource()->getAttribute('group_price');
+   var_dump($groupPrices);
+ 
+    if (!is_null($groupPrices) || is_array($groupPrices)) {
+        foreach ($groupPrices as $groupPrice) {
+            echo "<br/>";
+            echo $Groupprice = $groupPrice['price'];
+            echo "<br/>";
+            echo $Groupprice = $groupPrice['cust_group'];
+        }
+        
+    }
+
+}
+   **/
